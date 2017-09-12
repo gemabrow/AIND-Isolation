@@ -2,8 +2,9 @@
 test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
+import heapq
+import numpy
 import random
-
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
@@ -35,7 +36,7 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    return game.utility(player)
 
 
 def custom_score_2(game, player):
@@ -212,8 +213,37 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # get moves available to this MinimaxPlayer instance
+        legal_moves = game.get_legal_moves(self)
+
+        if not legal_moves or depth == 0:
+            return -1, -1
+
+        # array of scores of values at depth 1 of the minimax tree
+        scores_depth_1 = numpy.array([self.min_max_value(game.forecast_move(move),
+                                      depth - 1) for move in legal_moves])
+        max_idx = numpy.argmax(scores_depth_1)
+        return legal_moves[max_idx]
+
+    def min_max_value(self, game, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if self == game.active_player:
+            player = self
+            min_or_max = numpy.argmax
+        else:
+            player = game.get_opponent(self)
+            min_or_max = numpy.argmin
+
+        legal_moves = game.get_legal_moves(player)
+        if not legal_moves or depth == 0:
+            return self.score(game, self)
+
+        scores = numpy.array([self.min_max_value(game.forecast_move(move),
+                              depth - 1) for move in legal_moves])
+        player_best = min_or_max(scores)
+        return scores[player_best]
 
 
 class AlphaBetaPlayer(IsolationPlayer):

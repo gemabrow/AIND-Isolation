@@ -1,4 +1,5 @@
-
+isolation-[0-9]*.zip
+isolation-result-[0-9]*.json
 # Created by https://www.gitignore.io/api/python
 
 ### Python ###
@@ -19,6 +20,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+.idea/
 lib/
 lib64/
 parts/
