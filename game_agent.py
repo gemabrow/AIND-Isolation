@@ -434,8 +434,8 @@ class AlphaBetaPlayer(IsolationPlayer):
             return self.score(game, self)
 
         min_score = float("inf")
-        for move in legal_moves:
-            _game = game.forecast_move(move)
+        for _move in legal_moves:
+            _game = game.forecast_move(_move)
             min_score = min(min_score, self.score(_game, self) if depth == 1
                             else self.max_value(_game, depth - 1, alpha, beta)[0])
             if min_score <= alpha:
