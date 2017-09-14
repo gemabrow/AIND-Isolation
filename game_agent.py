@@ -62,7 +62,7 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    return game.utility(player)
 
 
 def custom_score_3(game, player):
@@ -88,7 +88,7 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    return game.utility(player)
 
 
 class IsolationPlayer:
@@ -284,8 +284,20 @@ class AlphaBetaPlayer(IsolationPlayer):
         """
         self.time_left = time_left
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # Initialize the best move so that this function returns something
+        # in case the search fails due to timeout
+        best_move = (-1, -1)
+
+        try:
+            # The try/except block will automatically catch the exception
+            # raised when the timer is about to expire.
+            return self.alphabeta(game, self.search_depth)
+
+        except SearchTimeout:
+            pass  # Handle any actions required after timeout as needed
+
+        # Return the best move from the last completed search iteration
+        return best_move
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
@@ -335,5 +347,98 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # return the best move from max_value at index 1
+        return self.max_value(game, depth, alpha, beta)[1]
+
+    def max_value(self, game, depth, alpha, beta):
+        """ Based on the Max-Value pseudo-code from the AIMA text
+
+        Parameters
+        ----------
+        game : isolation.Board
+            An instance of the Isolation game `Board` class representing the
+            game state being explored
+
+        depth : int
+            Depth is an integer representing the maximum number of plies to
+            search in the game tree before aborting
+
+        alpha : float
+            Alpha limits the lower bound of search on minimizing layers
+
+        beta : float
+            Beta limits the upper bound of search on maximizing layers
+
+        Returns
+        -------
+        float
+            The resultant score from making the best move found in the current
+            search; "-inf" if there are no legal moves
+
+        (int, int)
+            The board coordinates of the best move found in the current search;
+            returns the player's location if there are no legal moves
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        legal_moves = game.get_legal_moves(self)
+        if len(legal_moves) == 0:
+            return self.score(game, self), game.get_player_location(self)
+
+        move = random.choice(legal_moves)
+        max_score = float("-inf")
+        for _move in legal_moves:
+            _game = game.forecast_move(_move)
+            prev_best = max_score
+            max_score = max(max_score, self.score(_game, self) if depth == 1
+                            else self.min_value(_game, depth - 1, alpha, beta))
+            if max_score != prev_best:
+                move = _move
+            if max_score >= beta:
+                return max_score, move
+            alpha = max(alpha, max_score)
+        return max_score, move
+
+    def min_value(self, game, depth, alpha, beta):
+        """ Based on the Min-Value pseudo-code from the AIMA text
+
+        Parameters
+        ----------
+        game : isolation.Board
+            An instance of the Isolation game `Board` class representing the
+            game state being explored
+
+        depth : int
+            Depth is an integer representing the maximum number of plies to
+            search in the game tree before aborting
+
+        alpha : float
+            Alpha limits the lower bound of search on minimizing layers
+
+        beta : float
+            Beta limits the upper bound of search on maximizing layers
+
+        Returns
+        -------
+        float
+            The resultant score from making the best move for the opponent
+            found in the current search; "inf" if there are no legal moves
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        opponent = game.get_opponent(self)
+        legal_moves = game.get_legal_moves(opponent)
+        if len(legal_moves) == 0:
+            return self.score(game, self)
+
+        min_score = float("inf")
+        for move in legal_moves:
+            _game = game.forecast_move(move)
+            min_score = min(min_score, self.score(_game, self) if depth == 1
+                            else self.max_value(_game, depth - 1, alpha, beta)[0])
+            if min_score <= alpha:
+                return min_score
+            beta = min(beta, min_score)
+        return min_score
