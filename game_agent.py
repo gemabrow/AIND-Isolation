@@ -291,7 +291,11 @@ class AlphaBetaPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            return self.alphabeta(game, self.search_depth)
+            # NOTE: best_move is initialized to (-1, -1) and accounts
+            # for the 0th iteration of iterative deepening,
+            # thus, the 0th iteration is skipped here
+            for depth in range(1, game.width * game.height):
+                best_move = self.alphabeta(game, depth)
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
@@ -377,14 +381,14 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         (int, int)
             The board coordinates of the best move found in the current search;
-            returns the player's location if there are no legal moves
+            returns (-1, -1) if search depth is 0 or there are no legal moves
         """
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
         legal_moves = game.get_legal_moves(self)
-        if len(legal_moves) == 0:
-            return self.score(game, self), game.get_player_location(self)
+        if len(legal_moves) == 0 or depth == 0:
+            return self.score(game, self), (-1, -1)
 
         move = random.choice(legal_moves)
         max_score = float("-inf")
