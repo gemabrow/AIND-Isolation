@@ -2,9 +2,12 @@
 test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
-import heapq
-import numpy
 import random
+import numpy as np
+
+KNIGHT_VECTORS = [(-2, -1), (-2, 1), (-1, -2), (-1, 2),
+              (1, -2), (1, 2), (2, -1), (2, 1)]
+
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
@@ -35,8 +38,22 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    return game.utility(player)
+
+    if game.is_winner(player):
+        return float("inf")
+    if game.is_loser(player):
+        return float("-inf")
+
+    opponent = game.get_opponent(player)
+    player_y, player_x = game.get_player_location(player)
+    opponent_y, opponent_x = game.get_player_location(opponent)
+    # manhattan distance of 3 == movement of knight
+    if abs(opponent_y - player_y) + abs(opponent_x - player_x) == 3:
+        proximity_bonus = 5
+    else:
+        proximity_bonus = 1
+    return proximity_bonus * len(game.get_legal_moves(player)) #\
+    #    - len(game.get_legal_moves(opponent)) / len(game.get_blank_spaces())
 
 
 def custom_score_2(game, player):
@@ -61,8 +78,12 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    return game.utility(player)
+    if game.is_winner(player):
+        return float("inf")
+    if game.is_loser(player):
+        return float("-inf")
+    opponent = game.get_opponent(player)
+    return len(game.get_legal_moves(player)) / len(game.get_blank_spaces()) - len(game.get_legal_moves(opponent))
 
 
 def custom_score_3(game, player):
@@ -87,8 +108,12 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    return game.utility(player)
+    if game.is_winner(player):
+        return float("inf")
+    if game.is_loser(player):
+        return float("-inf")
+    opponent = game.get_opponent(player)
+    return len(game.get_legal_moves(player)) - len(game.get_legal_moves(opponent)) / len(game.get_blank_spaces())
 
 
 class IsolationPlayer:
@@ -113,6 +138,7 @@ class IsolationPlayer:
         positive value large enough to allow the function to return before the
         timer expires.
     """
+
     def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
         self.search_depth = search_depth
         self.score = score_fn
@@ -220,9 +246,9 @@ class MinimaxPlayer(IsolationPlayer):
             return -1, -1
 
         # array of scores of values at depth 1 of the minimax tree
-        scores_depth_1 = numpy.array([self.min_max_value(game.forecast_move(move),
-                                      depth - 1) for move in legal_moves])
-        max_idx = numpy.argmax(scores_depth_1)
+        scores_depth_1 = np.array([self.min_max_value(game.forecast_move(move),
+                                                      depth - 1) for move in legal_moves])
+        max_idx = np.argmax(scores_depth_1)
         return legal_moves[max_idx]
 
     def min_max_value(self, game, depth):
@@ -231,17 +257,17 @@ class MinimaxPlayer(IsolationPlayer):
 
         if self == game.active_player:
             player = self
-            min_or_max = numpy.argmax
+            min_or_max = np.argmax
         else:
             player = game.get_opponent(self)
-            min_or_max = numpy.argmin
+            min_or_max = np.argmin
 
         legal_moves = game.get_legal_moves(player)
         if not legal_moves or depth == 0:
             return self.score(game, self)
 
-        scores = numpy.array([self.min_max_value(game.forecast_move(move),
-                              depth - 1) for move in legal_moves])
+        scores = np.array([self.min_max_value(game.forecast_move(move),
+                                              depth - 1) for move in legal_moves])
         player_best = min_or_max(scores)
         return scores[player_best]
 
@@ -396,9 +422,10 @@ class AlphaBetaPlayer(IsolationPlayer):
             _game = game.forecast_move(_move)
             prev_best = max_score
             max_score = max(max_score, self.score(_game, self) if depth == 1
-                            else self.min_value(_game, depth - 1, alpha, beta))
+            else self.min_value(_game, depth - 1, alpha, beta))
             if max_score != prev_best:
                 move = _move
+            # pruning condition
             if max_score >= beta:
                 return max_score, move
             alpha = max(alpha, max_score)
@@ -441,7 +468,8 @@ class AlphaBetaPlayer(IsolationPlayer):
         for _move in legal_moves:
             _game = game.forecast_move(_move)
             min_score = min(min_score, self.score(_game, self) if depth == 1
-                            else self.max_value(_game, depth - 1, alpha, beta)[0])
+            else self.max_value(_game, depth - 1, alpha, beta)[0])
+            # pruning condition
             if min_score <= alpha:
                 return min_score
             beta = min(beta, min_score)
