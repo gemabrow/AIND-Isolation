@@ -5,13 +5,37 @@ and include the results in your report.
 import random
 import numpy as np
 
-KNIGHT_VECTORS = [(-2, -1), (-2, 1), (-1, -2), (-1, 2),
-              (1, -2), (1, 2), (2, -1), (2, 1)]
+
+# LM_COEFF = 0.8
+# TM_COEFF = 0.75
+# OP_M_COEFF = 1
+MOVEMENT_VECTORS = [(1, -2), (1, 2), (-2, -1), (-2, 1),
+                    (-1, -2), (-1, 2), (2, -1), (2, 1)]
 
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
     pass
+
+
+def get_tertiary_moves(game, legal_moves):
+    """Calculates the discrete manhattan distance between
+    two (y, x) tuples and returns this value
+    """
+    tertiary_moves = {(lm_y + v_y, lm_x + v_x)
+                      for v_y, v_x in MOVEMENT_VECTORS
+                      for lm_y, lm_x in legal_moves
+                      if game.move_is_legal((lm_y + v_y, lm_x + v_x))}
+    return tertiary_moves
+
+
+def get_manhattan_distance(position_a, position_b):
+    """Calculates the discrete manhattan distance between
+    two (y, x) tuples and returns this value
+    """
+    y_a, x_a = position_a
+    y_b, x_b = position_b
+    return abs(y_a - y_b) + abs(x_a - x_b)
 
 
 def custom_score(game, player):
@@ -38,22 +62,22 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-
     if game.is_winner(player):
         return float("inf")
     if game.is_loser(player):
         return float("-inf")
 
+    player_pos = game.get_player_location(player)
+    legal_moves = game.get_legal_moves(player)
+    tertiary_moves = get_tertiary_moves(game, legal_moves)
     opponent = game.get_opponent(player)
-    player_y, player_x = game.get_player_location(player)
-    opponent_y, opponent_x = game.get_player_location(opponent)
-    # manhattan distance of 3 == movement of knight
-    if abs(opponent_y - player_y) + abs(opponent_x - player_x) == 3:
-        proximity_bonus = 5
-    else:
-        proximity_bonus = 1
-    return proximity_bonus * len(game.get_legal_moves(player)) #\
-    #    - len(game.get_legal_moves(opponent)) / len(game.get_blank_spaces())
+    opponent_pos = game.get_player_location(opponent)
+    opponent_moves = game.get_legal_moves(opponent)
+    # 0.375 to 0.5
+    return (len(legal_moves)
+            + 0.5 * float(len(tertiary_moves)
+                            / get_manhattan_distance(player_pos, opponent_pos))
+            - len(opponent_moves))
 
 
 def custom_score_2(game, player):
@@ -63,7 +87,7 @@ def custom_score_2(game, player):
     Note: this function should be called from within a Player instance as
     `self.score()` -- you should not need to call this function directly.
 
-    Parameters
+    Parameters6
     ----------
     game : `isolation.Board`
         An instance of `isolation.Board` encoding the current state of the
@@ -83,7 +107,12 @@ def custom_score_2(game, player):
     if game.is_loser(player):
         return float("-inf")
     opponent = game.get_opponent(player)
-    return len(game.get_legal_moves(player)) / len(game.get_blank_spaces()) - len(game.get_legal_moves(opponent))
+    player_pos = game.get_player_location(player)
+    opponent_pos = game.get_player_location(opponent)
+
+    return float(len(game.get_legal_moves(player))**2
+                 / (get_manhattan_distance(player_pos, opponent_pos)
+                    + len(game.get_legal_moves(opponent))**2))
 
 
 def custom_score_3(game, player):
@@ -112,8 +141,16 @@ def custom_score_3(game, player):
         return float("inf")
     if game.is_loser(player):
         return float("-inf")
+
+    player_pos = game.get_player_location(player)
+    legal_moves = game.get_legal_moves(player)
+    tertiary_moves = get_tertiary_moves(game, legal_moves)
     opponent = game.get_opponent(player)
-    return len(game.get_legal_moves(player)) - len(game.get_legal_moves(opponent)) / len(game.get_blank_spaces())
+    opponent_pos = game.get_player_location(opponent)
+    # 0.5 * len(legal_moves) + len(tertiary_moves) for numerator
+    return (float((0.5 * len(legal_moves) + len(tertiary_moves))
+                  / get_manhattan_distance(player_pos, opponent_pos))
+            - len(game.get_legal_moves(opponent)))
 
 
 class IsolationPlayer:
@@ -422,7 +459,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             _game = game.forecast_move(_move)
             prev_best = max_score
             max_score = max(max_score, self.score(_game, self) if depth == 1
-            else self.min_value(_game, depth - 1, alpha, beta))
+                            else self.min_value(_game, depth - 1, alpha, beta))
             if max_score != prev_best:
                 move = _move
             # pruning condition

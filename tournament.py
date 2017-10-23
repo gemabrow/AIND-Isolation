@@ -23,7 +23,7 @@ from sample_players import (RandomPlayer, open_move_score,
 from game_agent import (MinimaxPlayer, AlphaBetaPlayer, custom_score,
                         custom_score_2, custom_score_3)
 
-NUM_MATCHES = 5  # number of matches against each opponent
+NUM_MATCHES = 100 # number of matches against each opponent
 TIME_LIMIT = 150  # number of milliseconds before timeout
 
 DESCRIPTION = """
@@ -130,7 +130,7 @@ def main():
     # starting position against the same adversaries in the tournament
     test_agents = [
         Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score), "AB_Custom"),
+        Agent(AlphaBetaPlayer(score_fn=custom_score),   "AB_Custom"),
         Agent(AlphaBetaPlayer(score_fn=custom_score_2), "AB_Custom_2"),
         Agent(AlphaBetaPlayer(score_fn=custom_score_3), "AB_Custom_3")
     ]

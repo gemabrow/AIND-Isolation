@@ -1,0 +1,52 @@
+
+This script evaluates the performance of the custom_score evaluation
+function against a baseline agent using alpha-beta search and iterative
+deepening (ID) called `AB_Improved`. The three `AB_Custom` agents use
+ID and alpha-beta search with the custom_score functions defined in
+game_agent.py.
+
+                        *************************                         
+                           Playing 150 Matches                              
+                        *************************                         
+ 
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      153 |   7    149 |  11    151 |   9    155 |   5  
+    2       AB_Open     85  |  75    95  |  65    81  |  79    78  |  82  
+    3      AB_Center    94  |  66    94  |  66    101 |  59    93  |  67  
+    4     AB_Improved   81  |  79    88  |  72    84  |  76    78  |  82  
+--------------------------------------------------------------------------
+           Win Rate:      64.5%        66.6%        65.2%        63.1%    
+
+ 
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      187 |  13    183 |  17    183 |  17    191 |   9  
+    2       AB_Open     110 |  90    105 |  95    114 |  86    97  |  103 
+    3      AB_Center    114 |  86    113 |  87    117 |  83    116 |  84  
+    4     AB_Improved   104 |  96    102 |  98    99  |  101   98  |  102 
+--------------------------------------------------------------------------
+           Win Rate:      64.4%        62.9%        64.1%        62.8%  
+
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      187 |  13    187 |  13    187 |  13    190 |  10  
+    2       AB_Open     107 |  93    99  |  101   101 |  99    109 |  91  
+    3      AB_Center    118 |  82    122 |  78    116 |  84    117 |  83  
+    4     AB_Improved   99  |  101   99  |  101   101 |  99    99  |  101 
+--------------------------------------------------------------------------
+           Win Rate:      63.9%        63.4%        63.1%        64.4%    
+
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      193 |   7    182 |  18    193 |   7    185 |  15  
+    2       MM_Open     158 |  42    150 |  50    148 |  52    157 |  43  
+    3      MM_Center    177 |  23    175 |  25    179 |  21    176 |  24  
+    4     MM_Improved   144 |  56    150 |  50    148 |  52    140 |  60  
+    5       AB_Open     104 |  96    97  |  103   107 |  93    102 |  98  
+    6      AB_Center    121 |  79    119 |  81    117 |  83    115 |  85  
+    7     AB_Improved   94  |  106   112 |  88    103 |  97    104 |  96  
+--------------------------------------------------------------------------
+           Win Rate:      70.8%        70.4%        71.1%        69.9%    
