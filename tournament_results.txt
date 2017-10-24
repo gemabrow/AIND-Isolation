@@ -18,6 +18,10 @@ game_agent.py.
 --------------------------------------------------------------------------
            Win Rate:      64.5%        66.6%        65.2%        63.1%    
 
+
+                        *************************                         
+                           Playing 200 Matches                              
+                        *************************                         
  
  Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
                         Won | Lost   Won | Lost   Won | Lost   Won | Lost 
@@ -50,3 +54,22 @@ game_agent.py.
     7     AB_Improved   94  |  106   112 |  88    103 |  97    104 |  96  
 --------------------------------------------------------------------------
            Win Rate:      70.8%        70.4%        71.1%        69.9%    
+
+                        *************************                         
+                           Playing 1000 Matches                              
+                        *************************                         
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      929 |  71    933 |  67    937 |  63    934 |  66  
+    2       MM_Open     759 |  241   778 |  222   752 |  248   755 |  245 
+    3      MM_Center    862 |  138   860 |  140   870 |  130   871 |  129 
+    4     MM_Improved   726 |  274   760 |  240   734 |  266   728 |  272 
+    5       AB_Open     525 |  475   542 |  458   558 |  442   550 |  450 
+    6      AB_Center    558 |  442   561 |  439   558 |  442   565 |  435 
+    7     AB_Improved   482 |  518   503 |  497   489 |  511   518 |  482 
+--------------------------------------------------------------------------
+           Win Rate:      69.2%        70.5%        70.0%        70.3%    
+
+There were 7.0 timeouts during the tournament -- make sure your agent handles search timeout correctly, and consider increasing the timeout margin for your agent.
+
