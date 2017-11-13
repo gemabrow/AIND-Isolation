@@ -1,6 +1,7 @@
 test_*.txt
 isolation-[0-9]*.zip
 isolation-result-[0-9]*.json
+*.aux
 # Created by https://www.gitignore.io/api/python
 
 ### Python ###

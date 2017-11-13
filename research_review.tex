@@ -23,7 +23,7 @@
 
 % layout settings
 \renewcommand{\footrulewidth}{0.5pt}
-\setlength\parindent{0pt}
+%\setlength\parindent{0pt}
 \setlength{\columnsep}{3cm}
 
 % listings options
@@ -39,432 +39,71 @@
 
 % header settings
 \pagestyle{fancy}
-\lhead{AI-NAND: Heuristic Analysis}
+\lhead{AI-NAND: Mastering the Game of Go}
 \rhead{Gerald Brown}%ID:1377271}}
 \cfoot{}
 \rfoot{\thepage}
 
+% The write up is approximately 1 page (500 words) and includes a summary of 
+% the paper (including new techniques introduced), and the key results (if any)
+% that were achieved.
 \begin{document}
-Hello
-% \section*{Exercises}
-% \begin{enumerate}[label={2.\theenumi}]
-%     \setcounter{enumi}{10} 
-%     \item {\bf Convert the given CFG to an equivalent PDA using Theorem 2.20:}
-%         \begin{lstlisting}
-%         E -> E + T | T
-%         T -> T times F | F
-%         F -> (E) | a
-%         \end{lstlisting}
-%         
-%         Informally, we can describe the PDA recognizing the above CFG as
-%         follows:
-%         \begin{enumerate}[label={\arabic*.}]
-%             \item Place the \$ symbol on top of the stack, and the (assumed)
-%                   start variable $E$ after that.
-%             \item Repeat the following until the \$ symbol is again encountered:
-%                 \begin{itemize}
-%                     \item If the top of the stack is an $E$, pop it and then
-%                           push either $E+T$ or $T$ onto the stack in a non-
-%                           deterministic way.
-%                     \item If the top of the stack is a $T$, pop it and then
-%                           push either $T\times F$ or $F$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is an $F$, pop it and then
-%                           push either $(E)$ or $a$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is terminal, read from input
-%                           comparing the two symbols -- if they match, repeat,
-%                           otherwise reject this branch.
-%                 \end{itemize}
-%             \item If the \$ symbol is encountered, enter the accept state.
-%         \end{enumerate}
-%        
-%         Formally, this definition is $(Q, \Sigma, \Gamma, \delta, q_0, F)$
-%         where $Q=\{q_0, q_1\}$, $\Sigma = \{+,\times, (,),a\}$,
-%         $\Gamma = \{E, T, F\}\cup \Sigma$ and $F=\{q_1\}$. Its transition
-%         function $\delta: Q\times \Sigma_{\varepsilon} \times \Gamma_{\varepsilon}
-%         \rightarrow P(Q\times\Gamma_{\varepsilon})$ is as follows:
-%         
-%         \[ 
-%             \delta(q,x,y) = 
-%             \begin{cases}
-%                 \{(q_0,E+T), (q_0, T)\} & if q=q_0, x=\varepsilon, y=E \\
-%                 \{(q_0,T\times F), (q_0, F)\} & if q=q_0, x=\varepsilon, y=T \\
-%                 \{(q_0,(E), (q_0 a)\} & if q=q_0, x=\varepsilon, y=F \\
-%                 \{(q_0,\varepsilon)\} & if q=q_0, x=y \\
-%                 \{(q_1,\varepsilon)\} & if q=q_0, x=\varepsilon, y=\$
-%             \end{cases}
-%         \]
-% 
-%         The transition diagram is depicted in Figure 1.
-% 
-%         \begin{figure}
-%         \centering
-%         \begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=4cm,
-%                     scale = 1, semithick, transform shape]
-%         
-%           \node[initial,state] (E)                    {$q_{\text{start}}$};
-%           \node[state]         (0) [      right of=E] {};
-%           \node[state]         (L) [      right of=0] {$q_{\text{loop}}$};
-%           \node[state]         (A1)[above       of=E] {};
-%           \node[state]         (A2)[      right of=A1]{};
-%           \node[state]         (M1)[below       of=E] {};
-%           \node[state]         (M2)[below right of=M1]{};
-%           \node[state]         (P1)[      right of=M2]{};
-%           \node[state]         (P2)[above right of=P1]{};
-%           \node[state,accepting](A)[      right of=L] {$q_{\text{accept}}$};
-%           \path [every node/.style={sloped,anchor=south,auto=false}]
-%               (E) edge              node {$\varepsilon,\ \varepsilon\rightarrow \$$} (0)
-%               (0) edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-%               (L) edge              node {$\varepsilon,\ E\rightarrow T$} (A1)
-%                   edge              node {$\varepsilon,\ T\rightarrow F$} (M1)
-%                   edge              node {$\varepsilon,\ F\rightarrow )$} (P1)
-%                   edge              node {$\varepsilon,\ \$\rightarrow \varepsilon$} (A)
-%                   edge [loop above] node {see *} (L)
-%               (A1)edge              node {$\varepsilon,\ \varepsilon\rightarrow +$} (A2)
-%               (A2)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-%               (M1)edge              node {$\varepsilon,\ \varepsilon\rightarrow\times$} (M2)
-%               (M2)edge              node {$\varepsilon,\ \varepsilon\rightarrow T$} (L)
-%               (P1)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (P2)
-%               (P2)edge              node {$\varepsilon,\ \varepsilon\rightarrow ($} (L);
-%         \end{tikzpicture}
-%         
-%         \begin{lstlisting}
-%         * 
-%         epsilon, E -> T
-%         epsilon, T -> F
-%         epsilon, F -> a
-%         (, ( -> epsilon
-%         ), ) -> epsilon
-%         +, + -> epsilon
-%         times, times -> epsilon
-%         a, a -> epsilon
-%         \end{lstlisting}
-%         \caption{The state diagram for 2.11} \label{The state diagram for our PDA}
-%         \end{figure}
-%         
-%     \item {\bf Convert the given CFG to an equivalent PDA using Theorem 2.20:}
-%         \begin{lstlisting}
-%         R -> XRX | S
-%         S -> aTb | bTa 
-%         T -> XTX | X | epsilon 
-%         X -> a | b 
-%         \end{lstlisting}
-%         
-%         Informally, we can describe the PDA recognizing the above CFG as
-%         follows:
-%         \begin{enumerate}[label={\arabic*.}]
-%             \item Place the \$ symbol on top of the stack, and the (assumed)
-%                   start variable $R$ after that.
-%             \item Repeat the following until the \$ symbol is again encountered:
-%                 \begin{itemize}
-%                     \item If the top of the stack is an $R$, pop it and then
-%                           push either $XRX$ or $S$ onto the stack in a non-
-%                           deterministic way.
-%                     \item If the top of the stack is an $S$, pop it and then
-%                           push either $aTb$ or $bTa$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is a $T$, pop it and then
-%                           push either $XTX$, $X$, or $\varepsilon$ onto the
-%                           stack non-deterministically.
-%                     \item If the top of the stack is an $X$, pop it and then
-%                           push either $a$ or $b$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is terminal, read from input
-%                           comparing the two symbols -- if they match, repeat,
-%                           otherwise reject this branch.
-%                 \end{itemize}
-%             \item If the \$ symbol is encountered, and assuming that all of the
-%                   input has been read, enter the accept state.
-%         \end{enumerate}
-%         
-%         Formally, this definition is $(Q, \Sigma, \Gamma, \delta, q_0, F)$
-%         where $Q=\{q_0, q_1\}$, $\Sigma = \{a, b\}$,
-%         $\Gamma = \{R, S, T, X\}\cup \Sigma$ and $F=\{q_1\}$. Its transition
-%         function $\delta: Q\times \Sigma_{\varepsilon} \times \Gamma_{\varepsilon}
-%         \rightarrow P(Q\times\Gamma_{\varepsilon})$ is as follows:
-%         
-%         \[ 
-%             \delta(q,x,y) = 
-%             \begin{cases}
-%                 \{(q_0,XRX), (q_0, S)\} & if q=q_0, x=\varepsilon, y=R \\
-%                 \{(q_0,aTb), (q_0, bTa)\} & if q=q_0, x=\varepsilon, y=S \\
-%                 \{(q_0,XTX), (q_0, X), (q_0, \varepsilon)\} & if q=q_0, x=\varepsilon, y=T \\
-%                 \{(q_0,a), (q_0, b)\} & if q=q_0, x=\varepsilon, y=T \\
-%                 \{(q_0,\varepsilon)\} & if q=q_0, x=y \\
-%                 \{(q_1,\varepsilon)\} & if q=q_0, x=\varepsilon, y=\$
-%             \end{cases}
-%         \]
-% 
-% %        The transition diagram is depicted in Figure 2.
-% %
-% %        \begin{figure}
-% %        \centering
-% %        \begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=4cm,
-% %                    scale = 1, semithick, transform shape]
-% %        
-% %          \node[initial,state] (R)                    {$q_{\text{start}}$};
-% %          \node[state]         (0) [      right of=R] {};
-% %          \node[state]         (L) [      right of=0] {$q_{\text{loop}}$};
-% %          \node[state]         (A1)[above       of=R] {};
-% %          \node[state]         (A2)[      right of=A1]{};
-% %          \node[state]         (M1)[below       of=R] {};
-% %          \node[state]         (M2)[below right of=M1]{};
-% %          \node[state]         (P1)[      right of=M2]{};
-% %          \node[state]         (P2)[above right of=P1]{};
-% %          \node[state,accepting](A)[      right of=L] {$q_{\text{accept}}$};
-% %          \path [every node/.style={sloped,anchor=south,auto=false}]
-% %              (R) edge              node {$\varepsilon,\ \varepsilon\rightarrow \$$} (0)
-% %              (0) edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-% %              (L) edge              node {$\varepsilon,\ E\rightarrow T$} (A1)
-% %                  edge              node {$\varepsilon,\ T\rightarrow F$} (M1)
-% %                  edge              node {$\varepsilon,\ F\rightarrow )$} (P1)
-% %                  edge              node {$\varepsilon,\ \$\rightarrow \varepsilon$} (A)
-% %                  edge [loop above] node {see *} (L)
-% %              (A1)edge              node {$\varepsilon,\ \varepsilon\rightarrow +$} (A2)
-% %              (A2)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-% %              (M1)edge              node {$\varepsilon,\ \varepsilon\rightarrow\times$} (M2)
-% %              (M2)edge              node {$\varepsilon,\ \varepsilon\rightarrow T$} (L)
-% %              (P1)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (P2)
-% %              (P2)edge              node {$\varepsilon,\ \varepsilon\rightarrow ($} (L);
-% %        \end{tikzpicture}
-% %        
-% %        \begin{lstlisting}
-% %        * 
-% %        epsilon, E -> T
-% %        epsilon, T -> F
-% %        epsilon, F -> a
-% %        (, ( -> epsilon
-% %        ), ) -> epsilon
-% %        +, + -> epsilon
-% %        times, times -> epsilon
-% %        a, a -> epsilon
-% %        \end{lstlisting}
-% %        \caption{The state diagram for our PDA} \label{The state diagram for our PDA}
-% %        \end{figure}
-%     \setcounter{enumi}{13}
-%     \item {\bf Convert the following CFG into an equivalent CFG in Chomsky normal form:
-%         \begin{lstlisting}
-%         A -> BAB | B | epsilon
-%         B -> 00 | epsilon
-%         \end{lstlisting}}
-%         
-%         \begin{lstlisting}
-%         S0 -> AB | BA | BD | BB | CC | epsilon 
-%         A -> AB | BA | BD | BB | CC 
-%         B -> CC
-%         C -> 0
-%         D -> AB
-%         \end{lstlisting}
-%         
-%     \setcounter{enumi}{29}
-%     \item {\bf Use the pumping lemma to prove the following languages are not
-%             context-free:}
-% 
-%         \begin{enumerate}[label={\alph*.},font={\bfseries}]
-%             \item $A = \left\{0^n1^n0^n1^n\ |\ n\geq 0\right\}$
-% 
-%                     \begin{proof}
-%                     Let $p$ be the pumping length from the pumping lemma and
-%                     $s = 0^p1^p0^p1^p$. We sill show that $s = uvxyz$ cannot
-%                     be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ consist of more than a single symbol from
-%                     our alphabet, then the order of the symbols appearance in
-%                     $uv^2xy^2$ will be out of order and, thusly, not in $A$. \Lightning
-%                         \item If $v$ and $y$ each consist of a single symbol
-%                         from our alphabet, we instead end up with $uv^2xy^2z$
-%                         containing unequal length of substrings of 0s and 1s.
-%                         These unequal substrings, however, would result in $s\notin A$. \Lightning
-%                     \end{itemize}
-% 
-%                     By these contradictions showing that $s$ cannot be pumped,
-%                     $A$ must not be context-free.
-%                     \end{proof} 
-%                     
-%             \item $B = \left\{0^n\#0^{2n}\#0^{3n}\ |\ n\geq 0\right\}$
-% 
-%                 \begin{proof}
-%                 Suppose $p$ is the pumping length of $B$ and let $s =  0^p\#0^{2p}\#0^{3p}$.
-%                 We will show that $s = uvxyz$ cannot be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ contain \# then $xv^2wy^2$ will
-%                         contain more than two \#s, resulting in $s\notin B$. \Lightning
-%                     \item Segmenting $s$ such that $v,y\in\{0^p, 0^{2p}, 0^{3p}\}$
-%                         leaves one of these segments uncontained by $v$ or $y$, resulting
-%                         in one segment not being proportianally lengthened.
-%                         From this, we would again arrive at $s\notin A$. \Lightning
-%                     \end{itemize}
-% 
-%                 By these contradictions showing that $s$ cannot be pumped,
-%                 $B$ must not be context-free.
-%                 
-%                 \end{proof}
-%             \item $C = \left\{w\#t\ |\ w\ \text{is a substring of}\ t, \text{where}\ w,t\in\{a,b\}^*\right\}$
-%                 \begin{proof}
-%                 Let $p$ be the pumping length of $C$ and let $s =  a^pb^p\#a^pb^p$.
-%                 We will show that $s = uvxyz$ cannot be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ contain \# then $xv^0wy^0$ will
-%                         contain any \#s, resulting in $s\notin B$. \Lightning
-%                         \item If $v$ or $y$ occur on the left side of the \#,
-%                         then $uv^2xy^2z$ will have a longer left side. \Lightning
-%                         \item If $v$ or $y$ occur on the right side \# then
-%                         $xv^0wy^0$ will also be longer on its left side,
-%                         resulting in $s\notin C$. \Lightning
-%                     \end{itemize}
-% 
-%                 By these contradictions showing that $s$ cannot be pumped,
-%                 $C$ must not be context-free.
-%                 
-%                 \end{proof}
-%              \item $D = \left\{t_1\#t_2\#\cdots \#t_k\ |\ k\geq 2,\ \text{each}\ t_i\in\{a,b\}^*,\ \text{and}\ t_i=t_j\ \text{for some}\ i\neq j\right\}$
-% 
-%                 \begin{proof}
-%                 Let $p$ be the pumping length of $D$ and let $s =  0^p\#0^{2p}\#0^{3p}$.
-%                 We will show that $s = uvxyz$ cannot be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ contain \# then $xv^0wy^0$ will
-%                         contain any \#s, resulting in $s\notin B$. \Lightning
-%                         \item If $v$ or $y$ occur on the left side of the \#,
-%                         then $uv^2xy^2z$ will have a longer left side. \Lightning
-%                         \item If $v$ or $y$ occur on the right side \# then
-%                         $xv^0wy^0$ will also be longer on its left side,
-%                         resulting in $s\notin C$. \Lightning
-%                     \end{itemize}
-% 
-%                 By these contradictions showing that $s$ cannot be pumped,
-%                 $D$ must not be context-free.
-%                 
-%                 \end{proof}
-%         \end{enumerate}
-% %    \item {\bf Let $B$ be the language of all palindromes over $\{0,1\}$ containing equal numbers of
-% %               0s and 1s. Show that $B$ is not context free.}
-% %        \begin{proof}
-% %         
-% %        \end{proof} 
-% %        
-% %        \begin{enumerate}[label={\alph*.},font={\bfseries}]
-% %            \setcounter{enumii}{1}
-% %            \item $L = \left\{0^m1^n\ |\ m\neq n\right\}$
-% %
-% %                The language is not regular. We will prove this using the
-% %                Myhill-Nerode Theorem.
-% %
-% %                \begin{proof}
-% %                    Consider the set $F = \left\{0^n\ |\ n\geq 1\right\}$ which
-% %                    is clearly infinite.
-% %
-% %                    Let $x$ and $y$ be any two members of $F$ such that $x=0^i$
-% %                    and $y=0^k$, where $i\neq j$. 
-% %                
-% %                    Let $z=1^i$. Now it is clear that $x$ and $y$
-% %                    are discernible given that $xz=0^i1^i \notin L$ whereas 
-% %                    $yz = 0^k1^i \in L$, implying $L$ is not regular.
-% %                \end{proof}
-% %
-% %            \item $L = \left\{w\ |\ w\in \left\{0,1\right\}^*\ \text{is not a palindrome}\right\}$
-% %
-% %                Assume, for the sake of contradiction, that the language $L$ is
-% %                regular. If $L$ is regular, then the complement of $L$, 
-% %                $\bar{L}$, is also regular by the closure of the class of
-% %                regular languages under complement. That is,
-% %                $\bar{L} = \left\{w\ |\ w\in\left\{0,1\right\}^*\ \text{is a palindrome}\right\}$
-% %                is a regular language.
-% %
-% %
-% %        \end{enumerate}
-% %\end{enumerate}
-% %\begin{itemize}
-% %    \item {\bf Prove any language of your choice is regular with the Myhill-Nerode
-% %          Theorem. Could you have done the proof (of regularity) with the
-% %          Pumping Lemma?}
-% %
-% %          Let $L=\left\{1^n\ |\ n\ \text{is odd}\right\}$. We will prove $L$ is
-% %          regular using the Myhill-Nerode Theorem. 
-% %          \begin{proof}
-% %              Consider the finite subset $A = \left\{1^n\ |\ n\ \text{is even}\right\}$.
-% %          \end{proof}
-% %
-% %\end{itemize}
-% %\begin{enumerate}[label={2.\theenumi}]
-% %    \setcounter{enumi}{2}
-% %    \item {\bf Answer each part for the following context-free grammar G.} 
-% %        \begin{enumerate}[label={\alph*.},font={\bfseries}]
-% %            \item $\{R, S, T, X\}$
-% %            \item $\{a, b\}$
-% %            \item $R$
-% %            \item $\{ab, ba, aaba\}$
-% %            \item $\{\lambda, a, b\}$
-% %            \item False
-% %            \item True
-% %            \item False
-% %            \item True
-% %            \item True
-% %            \item False
-% %            \item True
-% %            \item True
-% %            \item False
-% %            \item $L = \left\{ w\in \{a,b\}^*\ |\ w\ \text{is not a palindrome}\right\}$
-% %        \end{enumerate}
-% %    \item With $\Sigma = \{0,1\}$, give CFGs generating the given language.
-% %        \begin{enumerate}[label={\alph*.},font={\bfseries}]
-% %            \item $w$ contains at least three 1s
-% %                \begin{lstlisting}
-% %                S -> R1R1R1R
-% %                R -> 0R | 1R | lambda
-% %                \end{lstlisting}
-% %            \item $w$ starts and ends with the same symbol
-% %                \begin{lstlisting}
-% %                S -> 0A | 1B | lambda
-% %                A -> AA | BA | 0
-% %                B -> BB | AB | 1
-% %                \end{lstlisting}
-% %            \item $w$ has odd length 
-% %                \begin{lstlisting}
-% %                S -> R | X
-% %                R -> XXR | X  
-% %                X -> 0 | 1
-% %                \end{lstlisting}
-% %            \item $w$ is odd and its middle symbol is 0
-% %                \begin{lstlisting}
-% %                S -> 0S1 | 1S0 | 1S1 | 0S0 | 0 
-% %                \end{lstlisting}
-% %         \end{enumerate}
-% \end{enumerate}
-% %\begin{itemize}
-% %    \item {\bf Give an informal description of a PDA that recognizes the
-% %        language $\left\{x\in \left\{a,b\right\}^*\ |\ 
-% %        x\neq ww\ \text{for some}\ w\in\left\{a,b\right\}^*\right\}$.}
-% %        Informally, we can describe the PDA recognizing the above as
-% %        follows:
-% %        \begin{enumerate}[label={\arabic*.}]
-% %            \item Place the \$ symbol on top of the stack, and the (assumed)
-% %                  start variable $E$ after that.
-% %            \item Repeat the following until the \$ symbol is again encountered:
-% %                \begin{itemize}
-% %                    \item If the top of the stack is an $E$, pop it and then
-% %                          push either $E+T$ or $T$ onto the stack in a non-
-% %                          deterministic way.
-% %                    \item If the top of the stack is a $T$, pop it and then
-% %                          push either $T\times F$ or $F$ onto the stack non-
-% %                          deterministically.
-% %                    \item If the top of the stack is an $F$, pop it and then
-% %                          push either $(E)$ or $a$ onto the stack non-
-% %                          deterministically.
-% %                    \item If the top of the stack is terminal, read from input
-% %                          comparing the two symbols -- if they match, repeat,
-% %                          otherwise reject this branch.
-% %                \end{itemize}
-% %            \item If the \$ symbol is encountered, enter the accept state.
-% %        \end{enumerate}
-% % 
-% %%
-% %%        \begin{lstlisting}
-% %%        S -> aSa | bSb | B
-% %%        B -> bAa | aAb
-% %%        A -> lambda | aA | bA
-% %%        \end{lstlisting}
-% %\end{itemize}
+% Summary
+The adversarial game of Go is often used to test the performance of artificial
+intelligence due to the difficulty of building an evaluation function capable
+of assigning values to successive game states within a large state space. 
+AlphaGo, a search algorithm introduced by the DeepMind Team, evaluates moves by
+utilizing neural networks -- ``value networks'' and ``policy
+networks,'' specifically -- within a Monte Carlo Tree Search (MCTS) algorithm. 
+In doing so, AlphaGo restricts its search space to a subset of game states.
+Comparatively, the majority of algorithms at the time of AlphaGo's introduction
+evaluated search spaces that would be considerd supersets of AlphaGo's search
+space. The approach of the DeepMind Team proved not only more effective than
+that of their peers, it also resulted in the first AI capable of beating a
+professional human opponent in a game of Go.
+
+% - Supervised Learning
+AlphaGo's policy network is a neural network built using supervised learning
+for the purpose of predicting human expert moves. The KGS Go server, a game
+server known for hosting both national and international Go tournaments,
+served as AlphaGo's source for informing its 13-layer policy network. The
+SL policy network, as the DeepMind Team calls it, is compromised of 12 layers
+alternating between ``convolutional layers with weights, and rectifier 
+nonlinearities'' and a final softmax layer which provides a
+probability distribution over all available legal moves. With these, the SL
+policy network, given either all input features or solely raw board positions,
+achieved 55.7\% and 57.0\% prediction success rates, respectively. 
+
+% - Reinforcement Learning
+Given the SL policy network as a foundation, reinforcement learning improves 
+AlphaGo's play by addressing potential instances of overfitting.
+The reinforcement learning neural network (RL policy network)
+accomplishes this by replicating the SL policy network in structure
+and initializing all weights to that of the SL policy network. Following this,
+AlphaGo pits its current policies against a randomly selected previous
+iteration of its policies' weights. The SL policy network's weights are then 
+adjusted based upon winning/losing terminal game states (i.e. draws have no
+bearing on this process), and with reference to the weights of the opposition's
+policy network. AlphaGo's value networks similarly use reinforcement learning,
+but return a single prediction in lieu of a probability distribution.
+
+% New techniques introduced
+% - MCTS
+A new technique introduced by the DeepMind Team involved the rollout policy
+of their MCTS implementation. As opposed to the more application-specific
+rollout policies of previous Go-playing artificial intelligences, AlphaGo
+hashes the most likely action along with a pattern context. If the rollout
+matches the pattern context within the hast table, a high probability is
+attached to the move.
+
+% Key Results
+The key results of AlphaGo were revealed by testing. AlphaGo played games
+against a number of other Go programs, in addition to professional Go player
+Fan Hui, in a tournament. Probabilities were evaluated using the BayesElo
+program with the rating of Fan Hui as its foundation. Additionally, Chinese
+rules of {\emph komi} were used to score matches. The result was AlphaGo
+winning 99.8\% of matches against other Go programs and, furthermore, winning
+77\%, 86\%, and 99\% of matches against three different Go programs with a 
+four-stone handicap. Most significant of all, however, is that of 5 games
+played against Fan Hui, AlphaGo won all of the matches.
 \end{document}
-\grid
