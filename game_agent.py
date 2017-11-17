@@ -19,8 +19,7 @@ class SearchTimeout(Exception):
 
 
 def get_tertiary_moves(game, legal_moves):
-    """Calculates the discrete manhattan distance between
-    two (y, x) tuples and returns this value
+    """Using MOVEMENT_VECTORS, return the list of unoccupied positions
     """
     tertiary_moves = {(lm_y + v_y, lm_x + v_x)
                       for v_y, v_x in MOVEMENT_VECTORS

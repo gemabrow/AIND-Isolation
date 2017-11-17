@@ -1,8 +1,13 @@
+### testing ###
 test_*.txt
 isolation-[0-9]*.zip
 isolation-result-[0-9]*.json
+
+### LaTeX ###
+*.log
 *.aux
-# Created by https://www.gitignore.io/api/python
+*.listing
+_minted-heuristic_analysis/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

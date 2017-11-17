@@ -3,15 +3,38 @@
 % ams packages
 \usepackage{amsthm,amsfonts,amssymb,amsmath}
 % addl. packages not requiring options to be passed
-\usepackage{enumitem, epsfig, fancyhdr, graphicx, listings,%
-            marvosym, multicol, pgf, tikz, times, xcolor}
+\usepackage{enumitem, epsfig, fancyhdr, fancyvrb, graphicx, listings,%
+            marvosym, multicol, pgf, tcolorbox, tikz, times, xcolor}
 % other packages with options
 \usepackage[margin=2.3cm]{geometry}
-
+\usepackage[newfloat]{minted}
+\usepackage[parfill]{parskip}
+% code style for minted
+\usemintedstyle{monokai}
 % tikz automata settings 
 \usetikzlibrary{automata,arrows,positioning}
 % set text of transition to initial state to nothing
 \tikzset{initial text={}}
+
+% color definitions
+\definecolor{pink}{HTML}{F92672}
+\definecolor{teal}{HTML}{6699DF}
+\definecolor{purple}{HTML}{AE81FF}
+\definecolor{gray}{HTML}{A59F85}
+\definecolor{charcoal}{HTML}{383830}
+\definecolor{bg-black}{HTML}{272822}
+
+% define `codeblock' environment, default: python
+\tcbuselibrary{minted}
+\newtcblisting{codeblock}[2][python]{
+    colback             =   bg-black,
+    colframe            =   charcoal,
+    listing only,
+    minted options      =   {fontsize=\footnotesize},
+    minted language     =   #1,
+    title               =   \texttt{\textcolor{gray}{#2}},
+}
+\setmintedinline{style=friendly}
 
 % custom commands
 \newcommand{\wip}[2][red]{\textcolor{#1}{#2}}
@@ -20,10 +43,12 @@
 \newcommand{\mt}[1]{\mathrm{#1}}
 \newcommand{\opt}[1]{$\mathrm{OPT}(#1)$}
 \newcommand{\sopt}[2]{$\mathrm{OPT_{#1}}(#2)$}
+\newcommand{\score}[1][]{\texttt{AB\_Custom{#1}}}
+\newcommand{\code}[2][python]{\mintinline{#1}{#2}}
 
 % layout settings
 \renewcommand{\footrulewidth}{0.5pt}
-\setlength\parindent{0pt}
+%\setlength\parindent{0pt}
 \setlength{\columnsep}{3cm}
 
 % listings options
@@ -40,431 +65,261 @@
 % header settings
 \pagestyle{fancy}
 \lhead{AI-NAND: Heuristic Analysis}
-\rhead{Gerald Brown}%ID:1377271}}
+\rhead{Gerald Brown}
 \cfoot{}
 \rfoot{\thepage}
-
 \begin{document}
-Hello
-% \section*{Exercises}
-% \begin{enumerate}[label={2.\theenumi}]
-%     \setcounter{enumi}{10} 
-%     \item {\bf Convert the given CFG to an equivalent PDA using Theorem 2.20:}
-%         \begin{lstlisting}
-%         E -> E + T | T
-%         T -> T times F | F
-%         F -> (E) | a
-%         \end{lstlisting}
-%         
-%         Informally, we can describe the PDA recognizing the above CFG as
-%         follows:
-%         \begin{enumerate}[label={\arabic*.}]
-%             \item Place the \$ symbol on top of the stack, and the (assumed)
-%                   start variable $E$ after that.
-%             \item Repeat the following until the \$ symbol is again encountered:
-%                 \begin{itemize}
-%                     \item If the top of the stack is an $E$, pop it and then
-%                           push either $E+T$ or $T$ onto the stack in a non-
-%                           deterministic way.
-%                     \item If the top of the stack is a $T$, pop it and then
-%                           push either $T\times F$ or $F$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is an $F$, pop it and then
-%                           push either $(E)$ or $a$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is terminal, read from input
-%                           comparing the two symbols -- if they match, repeat,
-%                           otherwise reject this branch.
-%                 \end{itemize}
-%             \item If the \$ symbol is encountered, enter the accept state.
-%         \end{enumerate}
-%        
-%         Formally, this definition is $(Q, \Sigma, \Gamma, \delta, q_0, F)$
-%         where $Q=\{q_0, q_1\}$, $\Sigma = \{+,\times, (,),a\}$,
-%         $\Gamma = \{E, T, F\}\cup \Sigma$ and $F=\{q_1\}$. Its transition
-%         function $\delta: Q\times \Sigma_{\varepsilon} \times \Gamma_{\varepsilon}
-%         \rightarrow P(Q\times\Gamma_{\varepsilon})$ is as follows:
-%         
-%         \[ 
-%             \delta(q,x,y) = 
-%             \begin{cases}
-%                 \{(q_0,E+T), (q_0, T)\} & if q=q_0, x=\varepsilon, y=E \\
-%                 \{(q_0,T\times F), (q_0, F)\} & if q=q_0, x=\varepsilon, y=T \\
-%                 \{(q_0,(E), (q_0 a)\} & if q=q_0, x=\varepsilon, y=F \\
-%                 \{(q_0,\varepsilon)\} & if q=q_0, x=y \\
-%                 \{(q_1,\varepsilon)\} & if q=q_0, x=\varepsilon, y=\$
-%             \end{cases}
-%         \]
-% 
-%         The transition diagram is depicted in Figure 1.
-% 
-%         \begin{figure}
-%         \centering
-%         \begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=4cm,
-%                     scale = 1, semithick, transform shape]
-%         
-%           \node[initial,state] (E)                    {$q_{\text{start}}$};
-%           \node[state]         (0) [      right of=E] {};
-%           \node[state]         (L) [      right of=0] {$q_{\text{loop}}$};
-%           \node[state]         (A1)[above       of=E] {};
-%           \node[state]         (A2)[      right of=A1]{};
-%           \node[state]         (M1)[below       of=E] {};
-%           \node[state]         (M2)[below right of=M1]{};
-%           \node[state]         (P1)[      right of=M2]{};
-%           \node[state]         (P2)[above right of=P1]{};
-%           \node[state,accepting](A)[      right of=L] {$q_{\text{accept}}$};
-%           \path [every node/.style={sloped,anchor=south,auto=false}]
-%               (E) edge              node {$\varepsilon,\ \varepsilon\rightarrow \$$} (0)
-%               (0) edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-%               (L) edge              node {$\varepsilon,\ E\rightarrow T$} (A1)
-%                   edge              node {$\varepsilon,\ T\rightarrow F$} (M1)
-%                   edge              node {$\varepsilon,\ F\rightarrow )$} (P1)
-%                   edge              node {$\varepsilon,\ \$\rightarrow \varepsilon$} (A)
-%                   edge [loop above] node {see *} (L)
-%               (A1)edge              node {$\varepsilon,\ \varepsilon\rightarrow +$} (A2)
-%               (A2)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-%               (M1)edge              node {$\varepsilon,\ \varepsilon\rightarrow\times$} (M2)
-%               (M2)edge              node {$\varepsilon,\ \varepsilon\rightarrow T$} (L)
-%               (P1)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (P2)
-%               (P2)edge              node {$\varepsilon,\ \varepsilon\rightarrow ($} (L);
-%         \end{tikzpicture}
-%         
-%         \begin{lstlisting}
-%         * 
-%         epsilon, E -> T
-%         epsilon, T -> F
-%         epsilon, F -> a
-%         (, ( -> epsilon
-%         ), ) -> epsilon
-%         +, + -> epsilon
-%         times, times -> epsilon
-%         a, a -> epsilon
-%         \end{lstlisting}
-%         \caption{The state diagram for 2.11} \label{The state diagram for our PDA}
-%         \end{figure}
-%         
-%     \item {\bf Convert the given CFG to an equivalent PDA using Theorem 2.20:}
-%         \begin{lstlisting}
-%         R -> XRX | S
-%         S -> aTb | bTa 
-%         T -> XTX | X | epsilon 
-%         X -> a | b 
-%         \end{lstlisting}
-%         
-%         Informally, we can describe the PDA recognizing the above CFG as
-%         follows:
-%         \begin{enumerate}[label={\arabic*.}]
-%             \item Place the \$ symbol on top of the stack, and the (assumed)
-%                   start variable $R$ after that.
-%             \item Repeat the following until the \$ symbol is again encountered:
-%                 \begin{itemize}
-%                     \item If the top of the stack is an $R$, pop it and then
-%                           push either $XRX$ or $S$ onto the stack in a non-
-%                           deterministic way.
-%                     \item If the top of the stack is an $S$, pop it and then
-%                           push either $aTb$ or $bTa$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is a $T$, pop it and then
-%                           push either $XTX$, $X$, or $\varepsilon$ onto the
-%                           stack non-deterministically.
-%                     \item If the top of the stack is an $X$, pop it and then
-%                           push either $a$ or $b$ onto the stack non-
-%                           deterministically.
-%                     \item If the top of the stack is terminal, read from input
-%                           comparing the two symbols -- if they match, repeat,
-%                           otherwise reject this branch.
-%                 \end{itemize}
-%             \item If the \$ symbol is encountered, and assuming that all of the
-%                   input has been read, enter the accept state.
-%         \end{enumerate}
-%         
-%         Formally, this definition is $(Q, \Sigma, \Gamma, \delta, q_0, F)$
-%         where $Q=\{q_0, q_1\}$, $\Sigma = \{a, b\}$,
-%         $\Gamma = \{R, S, T, X\}\cup \Sigma$ and $F=\{q_1\}$. Its transition
-%         function $\delta: Q\times \Sigma_{\varepsilon} \times \Gamma_{\varepsilon}
-%         \rightarrow P(Q\times\Gamma_{\varepsilon})$ is as follows:
-%         
-%         \[ 
-%             \delta(q,x,y) = 
-%             \begin{cases}
-%                 \{(q_0,XRX), (q_0, S)\} & if q=q_0, x=\varepsilon, y=R \\
-%                 \{(q_0,aTb), (q_0, bTa)\} & if q=q_0, x=\varepsilon, y=S \\
-%                 \{(q_0,XTX), (q_0, X), (q_0, \varepsilon)\} & if q=q_0, x=\varepsilon, y=T \\
-%                 \{(q_0,a), (q_0, b)\} & if q=q_0, x=\varepsilon, y=T \\
-%                 \{(q_0,\varepsilon)\} & if q=q_0, x=y \\
-%                 \{(q_1,\varepsilon)\} & if q=q_0, x=\varepsilon, y=\$
-%             \end{cases}
-%         \]
-% 
-% %        The transition diagram is depicted in Figure 2.
-% %
-% %        \begin{figure}
-% %        \centering
-% %        \begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=4cm,
-% %                    scale = 1, semithick, transform shape]
-% %        
-% %          \node[initial,state] (R)                    {$q_{\text{start}}$};
-% %          \node[state]         (0) [      right of=R] {};
-% %          \node[state]         (L) [      right of=0] {$q_{\text{loop}}$};
-% %          \node[state]         (A1)[above       of=R] {};
-% %          \node[state]         (A2)[      right of=A1]{};
-% %          \node[state]         (M1)[below       of=R] {};
-% %          \node[state]         (M2)[below right of=M1]{};
-% %          \node[state]         (P1)[      right of=M2]{};
-% %          \node[state]         (P2)[above right of=P1]{};
-% %          \node[state,accepting](A)[      right of=L] {$q_{\text{accept}}$};
-% %          \path [every node/.style={sloped,anchor=south,auto=false}]
-% %              (R) edge              node {$\varepsilon,\ \varepsilon\rightarrow \$$} (0)
-% %              (0) edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-% %              (L) edge              node {$\varepsilon,\ E\rightarrow T$} (A1)
-% %                  edge              node {$\varepsilon,\ T\rightarrow F$} (M1)
-% %                  edge              node {$\varepsilon,\ F\rightarrow )$} (P1)
-% %                  edge              node {$\varepsilon,\ \$\rightarrow \varepsilon$} (A)
-% %                  edge [loop above] node {see *} (L)
-% %              (A1)edge              node {$\varepsilon,\ \varepsilon\rightarrow +$} (A2)
-% %              (A2)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (L)
-% %              (M1)edge              node {$\varepsilon,\ \varepsilon\rightarrow\times$} (M2)
-% %              (M2)edge              node {$\varepsilon,\ \varepsilon\rightarrow T$} (L)
-% %              (P1)edge              node {$\varepsilon,\ \varepsilon\rightarrow E$} (P2)
-% %              (P2)edge              node {$\varepsilon,\ \varepsilon\rightarrow ($} (L);
-% %        \end{tikzpicture}
-% %        
-% %        \begin{lstlisting}
-% %        * 
-% %        epsilon, E -> T
-% %        epsilon, T -> F
-% %        epsilon, F -> a
-% %        (, ( -> epsilon
-% %        ), ) -> epsilon
-% %        +, + -> epsilon
-% %        times, times -> epsilon
-% %        a, a -> epsilon
-% %        \end{lstlisting}
-% %        \caption{The state diagram for our PDA} \label{The state diagram for our PDA}
-% %        \end{figure}
-%     \setcounter{enumi}{13}
-%     \item {\bf Convert the following CFG into an equivalent CFG in Chomsky normal form:
-%         \begin{lstlisting}
-%         A -> BAB | B | epsilon
-%         B -> 00 | epsilon
-%         \end{lstlisting}}
-%         
-%         \begin{lstlisting}
-%         S0 -> AB | BA | BD | BB | CC | epsilon 
-%         A -> AB | BA | BD | BB | CC 
-%         B -> CC
-%         C -> 0
-%         D -> AB
-%         \end{lstlisting}
-%         
-%     \setcounter{enumi}{29}
-%     \item {\bf Use the pumping lemma to prove the following languages are not
-%             context-free:}
-% 
-%         \begin{enumerate}[label={\alph*.},font={\bfseries}]
-%             \item $A = \left\{0^n1^n0^n1^n\ |\ n\geq 0\right\}$
-% 
-%                     \begin{proof}
-%                     Let $p$ be the pumping length from the pumping lemma and
-%                     $s = 0^p1^p0^p1^p$. We sill show that $s = uvxyz$ cannot
-%                     be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ consist of more than a single symbol from
-%                     our alphabet, then the order of the symbols appearance in
-%                     $uv^2xy^2$ will be out of order and, thusly, not in $A$. \Lightning
-%                         \item If $v$ and $y$ each consist of a single symbol
-%                         from our alphabet, we instead end up with $uv^2xy^2z$
-%                         containing unequal length of substrings of 0s and 1s.
-%                         These unequal substrings, however, would result in $s\notin A$. \Lightning
-%                     \end{itemize}
-% 
-%                     By these contradictions showing that $s$ cannot be pumped,
-%                     $A$ must not be context-free.
-%                     \end{proof} 
-%                     
-%             \item $B = \left\{0^n\#0^{2n}\#0^{3n}\ |\ n\geq 0\right\}$
-% 
-%                 \begin{proof}
-%                 Suppose $p$ is the pumping length of $B$ and let $s =  0^p\#0^{2p}\#0^{3p}$.
-%                 We will show that $s = uvxyz$ cannot be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ contain \# then $xv^2wy^2$ will
-%                         contain more than two \#s, resulting in $s\notin B$. \Lightning
-%                     \item Segmenting $s$ such that $v,y\in\{0^p, 0^{2p}, 0^{3p}\}$
-%                         leaves one of these segments uncontained by $v$ or $y$, resulting
-%                         in one segment not being proportianally lengthened.
-%                         From this, we would again arrive at $s\notin A$. \Lightning
-%                     \end{itemize}
-% 
-%                 By these contradictions showing that $s$ cannot be pumped,
-%                 $B$ must not be context-free.
-%                 
-%                 \end{proof}
-%             \item $C = \left\{w\#t\ |\ w\ \text{is a substring of}\ t, \text{where}\ w,t\in\{a,b\}^*\right\}$
-%                 \begin{proof}
-%                 Let $p$ be the pumping length of $C$ and let $s =  a^pb^p\#a^pb^p$.
-%                 We will show that $s = uvxyz$ cannot be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ contain \# then $xv^0wy^0$ will
-%                         contain any \#s, resulting in $s\notin B$. \Lightning
-%                         \item If $v$ or $y$ occur on the left side of the \#,
-%                         then $uv^2xy^2z$ will have a longer left side. \Lightning
-%                         \item If $v$ or $y$ occur on the right side \# then
-%                         $xv^0wy^0$ will also be longer on its left side,
-%                         resulting in $s\notin C$. \Lightning
-%                     \end{itemize}
-% 
-%                 By these contradictions showing that $s$ cannot be pumped,
-%                 $C$ must not be context-free.
-%                 
-%                 \end{proof}
-%              \item $D = \left\{t_1\#t_2\#\cdots \#t_k\ |\ k\geq 2,\ \text{each}\ t_i\in\{a,b\}^*,\ \text{and}\ t_i=t_j\ \text{for some}\ i\neq j\right\}$
-% 
-%                 \begin{proof}
-%                 Let $p$ be the pumping length of $D$ and let $s =  0^p\#0^{2p}\#0^{3p}$.
-%                 We will show that $s = uvxyz$ cannot be pumped.
-%                     \begin{itemize}
-%                         \item If $v$ or $y$ contain \# then $xv^0wy^0$ will
-%                         contain any \#s, resulting in $s\notin B$. \Lightning
-%                         \item If $v$ or $y$ occur on the left side of the \#,
-%                         then $uv^2xy^2z$ will have a longer left side. \Lightning
-%                         \item If $v$ or $y$ occur on the right side \# then
-%                         $xv^0wy^0$ will also be longer on its left side,
-%                         resulting in $s\notin C$. \Lightning
-%                     \end{itemize}
-% 
-%                 By these contradictions showing that $s$ cannot be pumped,
-%                 $D$ must not be context-free.
-%                 
-%                 \end{proof}
-%         \end{enumerate}
-% %    \item {\bf Let $B$ be the language of all palindromes over $\{0,1\}$ containing equal numbers of
-% %               0s and 1s. Show that $B$ is not context free.}
-% %        \begin{proof}
-% %         
-% %        \end{proof} 
-% %        
-% %        \begin{enumerate}[label={\alph*.},font={\bfseries}]
-% %            \setcounter{enumii}{1}
-% %            \item $L = \left\{0^m1^n\ |\ m\neq n\right\}$
-% %
-% %                The language is not regular. We will prove this using the
-% %                Myhill-Nerode Theorem.
-% %
-% %                \begin{proof}
-% %                    Consider the set $F = \left\{0^n\ |\ n\geq 1\right\}$ which
-% %                    is clearly infinite.
-% %
-% %                    Let $x$ and $y$ be any two members of $F$ such that $x=0^i$
-% %                    and $y=0^k$, where $i\neq j$. 
-% %                
-% %                    Let $z=1^i$. Now it is clear that $x$ and $y$
-% %                    are discernible given that $xz=0^i1^i \notin L$ whereas 
-% %                    $yz = 0^k1^i \in L$, implying $L$ is not regular.
-% %                \end{proof}
-% %
-% %            \item $L = \left\{w\ |\ w\in \left\{0,1\right\}^*\ \text{is not a palindrome}\right\}$
-% %
-% %                Assume, for the sake of contradiction, that the language $L$ is
-% %                regular. If $L$ is regular, then the complement of $L$, 
-% %                $\bar{L}$, is also regular by the closure of the class of
-% %                regular languages under complement. That is,
-% %                $\bar{L} = \left\{w\ |\ w\in\left\{0,1\right\}^*\ \text{is a palindrome}\right\}$
-% %                is a regular language.
-% %
-% %
-% %        \end{enumerate}
-% %\end{enumerate}
-% %\begin{itemize}
-% %    \item {\bf Prove any language of your choice is regular with the Myhill-Nerode
-% %          Theorem. Could you have done the proof (of regularity) with the
-% %          Pumping Lemma?}
-% %
-% %          Let $L=\left\{1^n\ |\ n\ \text{is odd}\right\}$. We will prove $L$ is
-% %          regular using the Myhill-Nerode Theorem. 
-% %          \begin{proof}
-% %              Consider the finite subset $A = \left\{1^n\ |\ n\ \text{is even}\right\}$.
-% %          \end{proof}
-% %
-% %\end{itemize}
-% %\begin{enumerate}[label={2.\theenumi}]
-% %    \setcounter{enumi}{2}
-% %    \item {\bf Answer each part for the following context-free grammar G.} 
-% %        \begin{enumerate}[label={\alph*.},font={\bfseries}]
-% %            \item $\{R, S, T, X\}$
-% %            \item $\{a, b\}$
-% %            \item $R$
-% %            \item $\{ab, ba, aaba\}$
-% %            \item $\{\lambda, a, b\}$
-% %            \item False
-% %            \item True
-% %            \item False
-% %            \item True
-% %            \item True
-% %            \item False
-% %            \item True
-% %            \item True
-% %            \item False
-% %            \item $L = \left\{ w\in \{a,b\}^*\ |\ w\ \text{is not a palindrome}\right\}$
-% %        \end{enumerate}
-% %    \item With $\Sigma = \{0,1\}$, give CFGs generating the given language.
-% %        \begin{enumerate}[label={\alph*.},font={\bfseries}]
-% %            \item $w$ contains at least three 1s
-% %                \begin{lstlisting}
-% %                S -> R1R1R1R
-% %                R -> 0R | 1R | lambda
-% %                \end{lstlisting}
-% %            \item $w$ starts and ends with the same symbol
-% %                \begin{lstlisting}
-% %                S -> 0A | 1B | lambda
-% %                A -> AA | BA | 0
-% %                B -> BB | AB | 1
-% %                \end{lstlisting}
-% %            \item $w$ has odd length 
-% %                \begin{lstlisting}
-% %                S -> R | X
-% %                R -> XXR | X  
-% %                X -> 0 | 1
-% %                \end{lstlisting}
-% %            \item $w$ is odd and its middle symbol is 0
-% %                \begin{lstlisting}
-% %                S -> 0S1 | 1S0 | 1S1 | 0S0 | 0 
-% %                \end{lstlisting}
-% %         \end{enumerate}
-% \end{enumerate}
-% %\begin{itemize}
-% %    \item {\bf Give an informal description of a PDA that recognizes the
-% %        language $\left\{x\in \left\{a,b\right\}^*\ |\ 
-% %        x\neq ww\ \text{for some}\ w\in\left\{a,b\right\}^*\right\}$.}
-% %        Informally, we can describe the PDA recognizing the above as
-% %        follows:
-% %        \begin{enumerate}[label={\arabic*.}]
-% %            \item Place the \$ symbol on top of the stack, and the (assumed)
-% %                  start variable $E$ after that.
-% %            \item Repeat the following until the \$ symbol is again encountered:
-% %                \begin{itemize}
-% %                    \item If the top of the stack is an $E$, pop it and then
-% %                          push either $E+T$ or $T$ onto the stack in a non-
-% %                          deterministic way.
-% %                    \item If the top of the stack is a $T$, pop it and then
-% %                          push either $T\times F$ or $F$ onto the stack non-
-% %                          deterministically.
-% %                    \item If the top of the stack is an $F$, pop it and then
-% %                          push either $(E)$ or $a$ onto the stack non-
-% %                          deterministically.
-% %                    \item If the top of the stack is terminal, read from input
-% %                          comparing the two symbols -- if they match, repeat,
-% %                          otherwise reject this branch.
-% %                \end{itemize}
-% %            \item If the \$ symbol is encountered, enter the accept state.
-% %        \end{enumerate}
-% % 
-% %%
-% %%        \begin{lstlisting}
-% %%        S -> aSa | bSb | B
-% %%        B -> bAa | aAb
-% %%        A -> lambda | aA | bA
-% %%        \end{lstlisting}
-% %\end{itemize}
+\section*{Approach}
+With my approach to providing an evaluation function, I iterated over a
+multitude of different approaches. After the initial batch of testing, more
+simplistic evaluation functions outperformed the more comprehensive evaluation
+functions and were subsequently scrapped. The three evaluation
+functions \code{AB_Custom()}, \code{AB_Custom_2()}, and \code{AB_Custom_3()} 
+are the result of improving upon the simpler heuristics from that initial round
+of testing.
+
+\begin{codeblock}{improved\_score() from sample\_players.py}
+    if game.is_loser(player):
+        return float("-inf")
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves)
+\end{codeblock}
+    
+Each evaluation functions starts with \code{improved_score()} as
+a foundation and builds upon it by including additional variables based on
+features of the game state and modifiers to said variables (in the form
+of constants, exponents, etc.). This rationale stemmed from the poor
+performance of more comprehensive evaluation functions when tested against
+\code{improved_score()}. This revealed the computational trade-offs were
+not worth it, in this case, contributing to the emphasis of simplicity in
+further development of evalution functions.
+
+% tertiary moves
+Notable for its usage in two of the three custom evaluation functions are
+``tertiary moves''. We define tertiary moves as the set of legal moves $A_L^\prime$
+available to our player in a gamestate $s'$ after applying an action $a\in A_L$ 
+to a gamestate $s$, where $a$ is a move in the set $A_L$ obtained from calling the
+function \code{game.get_legal_moves(player)}.
+
+\begin{codeblock}{get\_tertiary\_moves(game, legal\_moves) from game\_agent.py}
+MOVEMENT_VECTORS = [(1, -2), (1, 2), (-2, -1), (-2, 1),
+        (-1, -2), (-1, 2), (2, -1), (2, 1)]
+
+def get_tertiary_moves(game, legal_moves):
+    tertiary_moves = {(lm_y + v_y, lm_x + v_x)
+                      for v_y, v_x in MOVEMENT_VECTORS
+                      for lm_y, lm_x in legal_moves
+                      if game.move_is_legal((lm_y + v_y, lm_x + v_x))}
+    return tertiary_moves
+\end{codeblock}
+
+The set of tertiary moves is determined by applying a set of vectors 
+representing the legal movement of a Knight to the player's position in
+$s^\prime$ and determining if that is valid. The validity is dependent solely
+upon whether the position is within the dimensions of the game board, and if
+the position is vacant -- it does not account for the possiblity of the
+opponent moving to that position following $s^\prime$.
+
+\section*{Implementation}
+
+\begin{codeblock}{all custom\_score() implementations include the following}
+    if game.is_winner(player):
+        return float("inf")
+    if game.is_loser(player):
+        return float("-inf")
+\end{codeblock}
+
+As previously mentioned, each heuristic treats \code{improved_score()} as an
+initial starting point. With that, the above snippet is common to each of them
+meaning each treats terminal game states in the same way.
+
+\begin{codeblock}{custom\_score(game, player) from game\_agent.py}
+    player_pos      =  game.get_player_location(player)
+    legal_moves     =  game.get_legal_moves(player)
+    tertiary_moves  =  get_tertiary_moves(game, legal_moves)
+    opponent        =  game.get_opponent(player)
+    opponent_pos    =  game.get_player_location(opponent)
+    opponent_moves  =  game.get_legal_moves(opponent)
+    return (len(legal_moves)
+            + 0.5 * float(len(tertiary_moves)
+                  / get_manhattan_distance(player_pos, opponent_pos))
+            - len(opponent_moves))
+\end{codeblock}
+
+With \code{custom_score()}, we have the most obvious case from which
+\code{improved_score()} served as the foundation. This heuristic is identical
+to \code{improved_score()}, while the number of tertiary moves grows in
+importance as the player and its opponent near each other. The constant
+\code{0.5} was determined through experimentation.
+
+\begin{codeblock}{custom\_score\_2(game, player) from game\_agent.py}
+    opponent        =  game.get_opponent(player)
+    player_pos      =  game.get_player_location(player)
+    opponent_pos    =  game.get_player_location(opponent)
+
+    return float(len(game.get_legal_moves(player))**2
+                 / (get_manhattan_distance(player_pos, opponent_pos)
+                    + len(game.get_legal_moves(opponent))**2))
+\end{codeblock}
+
+\code{custom_score_2()} works similarly but maintains an inverse
+relationship between the number of legal moves available to the player and the 
+opponent. This heuristic servers as an attempt at maintaining proximity
+to the opponent after testing indicated the failings of other heuristics
+against the centering heuristic. Tertiary moves are not included so as to save
+computation time for iterative deepening.
+
+\begin{codeblock}{custom\_score\_3(game, player) from game\_agent.py}
+    player_pos      =  game.get_player_location(player)
+    legal_moves     =  game.get_legal_moves(player)
+    tertiary_moves  =  get_tertiary_moves(game, legal_moves)
+    opponent        =  game.get_opponent(player)
+    opponent_pos    =  game.get_player_location(opponent)
+    return (float((0.5 * len(legal_moves) + len(tertiary_moves))
+                  / get_manhattan_distance(player_pos, opponent_pos))
+            - len(game.get_legal_moves(opponent)))
+\end{codeblock}
+
+With \code{custom_score_3()}, tertiary moves are given precedence over the set
+of legal moves. The constant of \code{0.5} was arrived at through testing.
+
+\section*{Results}
+
+Testing revealed inconsistent results hence the additional rounds, as well as
+incremental matches per round, of testing. Testing was initially limited to
+opponents utilizing alpha-beta pruning, with the exception of the random agent.
+Mini-max agents were added back in for the sake of thoroughness during what was
+intended to be a final round of testing, only to reveal further inconsistencies
+in terms of the winningest evaluation heuristic.
+\begin{figure}[H]
+\begin{Verbatim}[fontsize=\footnotesize]
+  **********************************************************************
+  *                              LEGEND                                *
+  *   (of AB_Custom, AB_Custom_2, AB_Custom_3 wins against Opponent)   *
+  *   --------------------------------------------------------------   *
+  *                        *: 1st most wins                            *
+  *                        +: 2nd most wins                            *
+  **********************************************************************
+
+                        *************************                         
+                           Playing 150 Matches                              
+                        *************************                         
+ 
+                                 Round 1 
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      153 |   7    149 |  11   +151 |   9   *155 |   5  
+    2       AB_Open     85  |  75   *95  |  65   +81  |  79    78  |  82  
+    3      AB_Center    94  |  66   +94  |  66   *101 |  59    93  |  67  
+    4     AB_Improved   81  |  79   *88  |  72   +84  |  76    78  |  82  
+--------------------------------------------------------------------------
+           Win Rate:      64.5%     *  66.6%     +  65.2%        63.1%    
+\end{Verbatim}
+\end{figure}
+
+The first round of testing revealed that \code{custom_score()} was the most
+winningest evaluation heuristic, on average. With considering the results of
+all but those against the Random opponent, \code{AB_Custom} exhibits an even
+higher win rate than \code{AB_Custom_2} and \code{AB_Custom_3}.
+
+\begin{figure}[H]
+\begin{Verbatim}[fontsize=\footnotesize]
+                        *************************                         
+                           Playing 200 Matches                              
+                        *************************                         
+                                 
+                                 Round 2                             
+ 
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      187 |  13   +183 |  17   +183 |  17   *191 |   9  
+    2       AB_Open     110 |  90   +105 |  95   *114 |  86    97  |  103 
+    3      AB_Center    114 |  86    113 |  87   *117 |  83   +116 |  84  
+    4     AB_Improved   104 |  96   *102 |  98   +99  |  101   98  |  102 
+--------------------------------------------------------------------------
+           Win Rate:      64.4%     +  62.9%     *  64.1%        62.8%  
+
+                                 Round 3                             
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      187 |  13   +187 |  13   +187 |  13   *190 |  10  
+    2       AB_Open     107 |  93    99  |  101  +101 |  99   *109 |  91  
+    3      AB_Center    118 |  82   *122 |  78    116 |  84   +117 |  83  
+    4     AB_Improved   99  |  101  +99  |  101  *101 |  99   +99  |  101 
+--------------------------------------------------------------------------
+           Win Rate:      63.9%     +  63.4%        63.1%     *  64.4%    
+
+                                 Round 4                             
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      193 |   7    182 |  18   *193 |   7   +185 |  15  
+    2       MM_Open     158 |  42   +150 |  50    148 |  52   *157 |  43  
+    3      MM_Center    177 |  23    175 |  25   *179 |  21   +176 |  24  
+    4     MM_Improved   144 |  56   *150 |  50   +148 |  52    140 |  60  
+    5       AB_Open     104 |  96    97  |  103  *107 |  93   +102 |  98  
+    6      AB_Center    121 |  79   *119 |  81   +117 |  83    115 |  85  
+    7     AB_Improved   94  |  106  *112 |  88    103 |  97   +104 |  96  
+--------------------------------------------------------------------------
+           Win Rate:      70.8%     +  70.4%     *  71.1%        69.9%    
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       Avg Win Rate
+        over Rounds:                   65.6%     *  66.1%      + 65.7%    
+\end{Verbatim}
+\end{figure}
+
+With increasing the number of matches played per round, and reintroducing
+the mini-max tree traversal, \code{AB_Custom_2} took the lead. Examining
+the results of each round, however, appears to delegitimize these results as
+indicative of the efficacy of the evaluation heuristics and, instead, to 
+be the result of favorable RNG outcomes. Due to this, the number of matches was
+increased further for a final 5th round.
+
+\begin{figure}[H]
+\begin{Verbatim}[fontsize=\footnotesize]
+                        *************************                         
+                           Playing 1000 Matches                              
+                        *************************                         
+
+                                 Round 5
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+                        Won | Lost   Won | Lost   Won | Lost   Won | Lost 
+    1       Random      929 |  71    933 |  67   *937 |  63   +934 |  66  
+    2       MM_Open     759 |  241  *778 |  222   752 |  248  +755 |  245 
+    3      MM_Center    862 |  138   860 |  140  +870 |  130  *871 |  129 
+    4     MM_Improved   726 |  274  *760 |  240  +734 |  266   728 |  272 
+    5       AB_Open     525 |  475   542 |  458  *558 |  442  +550 |  450 
+    6      AB_Center    558 |  442  +561 |  439   558 |  442  *565 |  435 
+    7     AB_Improved   482 |  518  +503 |  497   489 |  511  *518 |  482 
+--------------------------------------------------------------------------
+           Win Rate:      69.2%     *  70.5%        70.0%     +  70.3%    
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+           Win Rate:                *  66.7%        66.0%     +  66.4%
+      (excluding Random)
+\end{Verbatim}
+\end{figure}
+
+Surprisingly, all custom evaluation heuristics performed better than
+\code{AB_Improved}, albeit to a minor degree. Isolating the results of this
+final round, \code{AB_Custom} exhibits the highest win rate. 
+\section*{Selection}
+Based upon the results of Round 5, as well the win rates when excluding the 
+Random agent -- as I would not expect randomization to be the sole algorithm of
+any effective evaluation heuristic, I recommend the usage of the 
+\code{AB_Custom} evaluation heuristic. This is due to its overall performance
+(its win rate) during Round 5's testing, it's win rate with excluding the
+Random agent for the rationale cited above, as well as it consistently either
+having the highest or second highest win rate over all five rounds of testing.
 \end{document}
 \grid
